@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -23,7 +23,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
-        // WARNING: This is a placeholder. We will exploit this in Day 2 (IDOR)!
+        // VULNERABILITY: IDOR (Insecure Direct Object Reference)
+        // It just fetches the user by ID without checking if the logged-in user OWNS this ID.
         return userRepository.findById(id).orElse(null);
     }
 
