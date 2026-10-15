@@ -18,21 +18,14 @@ spring:
 
   h2:
     console:
-      enabled: true
+      enabled: false # DISABLE IN PRODUCTION!
       path: /h2-console
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health, info
   endpoint:
     health:
-      show-details: always
-
-
-app:
-  stripe:
-    api-key-live: sk_live_1234567890abcdef # Sanitizer catches "key"
-  internal:
-    dbConnectionString: jdbc:postgresql://prod-db:5432/app?user=admin&pass=SuperSecret123 # Sanitizer MISSES this!
+      show-details: when-authorized

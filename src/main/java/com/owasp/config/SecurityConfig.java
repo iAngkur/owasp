@@ -23,17 +23,24 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-                        // VULNERABILITY 3: Allowing public access to Actuator and H2
-                        .requestMatchers("/actuator/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
 
                 .httpBasic(httpBasic -> {})
-                // VULNERABILITY 4: Disabling crucial security headers
+
                 .headers(headers -> headers
-                        .contentTypeOptions(contentType -> contentType.disable()) // Allows MIME sniffing
-                        .frameOptions(frame -> frame.disable()) // Allows Clickjacking
+                        // Prevent MIME-type sniffing
+                        .contentTypeOptions(contentType -> {})
+                        // Prevent Clickjacking (deny framing entirely for APIs)
+                        .frameOptions(frame -> frame.deny())
+                        // Enable HSTS (Force HTTPS in production)
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000)
+                        )
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
