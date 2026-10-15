@@ -2,7 +2,10 @@ package com.owasp.controller;
 
 import com.owasp.entity.User;
 import com.owasp.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,11 +24,24 @@ public class UserController {
         return userRepository.findAll();
     }
 
+    // SECURE IDOR FIX:
+    // We inject the 'Authentication' object to see who is currently logged in.
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        // VULNERABILITY: IDOR (Insecure Direct Object Reference)
-        // It just fetches the user by ID without checking if the logged-in user OWNS this ID.
-        return userRepository.findById(id).orElse(null);
+    public User getUserById(@PathVariable Long id, Authentication authentication) {
+        User requestedUser = userRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String loggedInUsername = authentication.getName();
+
+        boolean isOwner = requestedUser.getUsername().equals(loggedInUsername);
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isOwner || isAdmin) {
+            return requestedUser;
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: You can only view your own profile.");
     }
 
     @PostMapping
