@@ -59,11 +59,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.google.common</groupId>
-			<artifactId>google-commons-utils</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -71,35 +66,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>enforce-dependencies</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<!-- Rule 1: Ban Snapshot versions in production builds -->
-								<requireReleaseDeps>
-									<message>No Snapshots Allowed in Production!</message>
-								</requireReleaseDeps>
-
-								<!-- Rule 2: Ban the specific malicious library -->
-								<bannedDependencies>
-									<excludes>
-										<exclude>com.google.common:google-commons-utils</exclude>
-									</excludes>
-									<message>Malicious or unapproved dependency detected!</message>
-								</bannedDependencies>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

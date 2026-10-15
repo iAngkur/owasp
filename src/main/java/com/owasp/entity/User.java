@@ -15,4 +15,7 @@ public class User {
     private String username;
     private String email;
     private String role; // e.g., "USER", "ADMIN"
+
+    // VULNERABILITY 1: We will initially save this in plaintext or weak hash
+    private String password;
 }

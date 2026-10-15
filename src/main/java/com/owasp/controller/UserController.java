@@ -1,6 +1,5 @@
 package com.owasp.controller;
 
-import com.google.common.DataProcessor;
 import com.owasp.entity.User;
 import com.owasp.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -50,8 +49,4 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    @GetMapping("/process")
-    public String processData(@RequestParam String data) {
-        return DataProcessor.processData(data);
-    }
 }
