@@ -23,12 +23,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-                        // VULNERABILITY: We are allowing ALL /api/** endpoints to be accessed by ANY authenticated user.
+                        // VULNERABILITY 3: Allowing public access to Actuator and H2
+                        .requestMatchers("/actuator/**", "/h2-console/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
 
-                .httpBasic(httpBasic -> {}) // Enable HTTP Basic Auth for Postman testing
+                .httpBasic(httpBasic -> {})
+                // VULNERABILITY 4: Disabling crucial security headers
+                .headers(headers -> headers
+                        .contentTypeOptions(contentType -> contentType.disable()) // Allows MIME sniffing
+                        .frameOptions(frame -> frame.disable()) // Allows Clickjacking
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
